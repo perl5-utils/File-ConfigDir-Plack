@@ -28,6 +28,12 @@ $VERSION = '0.001';
                  ALL => [@EXPORT_OK],
                );
 
+my $plack_app;
+BEGIN
+{
+    defined $ENV{PLACK_ENV} and $plack_app = $0;
+}
+
 =head1 SYNOPSIS
 
 Quick summary of what the module does.
@@ -55,7 +61,7 @@ Returns the configuration directory of a L<Plack> application.
 my $plack_app_dir = sub {
     my @dirs;
 
-    defined $ENV{PLACK_APP} and push( @dirs, File::Basename::dirname(File::Basename::dirname($ENV{PLACK_APP})) );
+    defined $plack_app and push( @dirs, File::Basename::dirname($plack_app) );
 
     return @dirs;
 };
