@@ -7,9 +7,10 @@ use warnings FATAL => 'all';
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 
 use Carp qw(croak);
+use Cwd ();
 use Exporter ();
-require File::Basename;
-require File::Spec;
+use File::Basename ();
+use File::Spec ();
 use File::ConfigDir ();
 
 =head1 NAME
@@ -36,32 +37,68 @@ BEGIN
 
 =head1 SYNOPSIS
 
-Quick summary of what the module does.
-
-Perhaps a little code snippet.
-
     use File::ConfigFir 'config_dirs';
     use File::ConfigDir::Plack;
 
     my @dirs = config_dirs();
+    my @foos = config_dirs('foo');
+
+Of course, in edge case you need to figure out the dedicated configuration
+locations:
+
+    use File::ConfigDir::Plack qw/plack_app_dir plack_env_dir/;
+
+    # remember - directory source functions always return lists, even
+    #            only one entry is in there
+    my @plack_app_dir = plack_app_dir;
+    my @plack_env_dir = plack_env_dir;
+    my @plack_env_foo = plack_env_dir('foo');
+
+=head1 DESCRIPTION
+
+File::ConfigDir::Plack works as plugin for L<File::ConfigDir> to find
+configurations directories for L<Plack> environments. This requires
+the environment variable C<PLACK_ENV> being set and the directory
+C<environments> must exists in the directory of the running process image
+or up to 3 levels above.
 
 =head1 EXPORT
 
 This module doesn't export anything by default. You have to request any
 desired explicitly.
 
-=head1 SUBROUTINES/METHODS
+=head1 SUBROUTINES
 
 =head2 plack_app_dir
 
-Returns the configuration directory of a L<Plack> application.
+Returns the configuration directory of a L<Plack> application currently
+executed. It doesn't work outside of a Plack application.
 
 =cut
+
+my @search_locations = (
+    File::Spec->curdir, 
+    File::Spec->updir, 
+    File::Spec->catdir(File::Spec->updir, File::Spec->updir),
+    File::Spec->catdir(File::Spec->updir, File::Spec->updir, File::Spec->updir),
+);
 
 my $plack_app_dir = sub {
     my @dirs;
 
-    defined $plack_app and push( @dirs, File::Basename::dirname($plack_app) );
+    if(defined $plack_app)
+    {
+	my $app_dir = File::Basename::dirname($plack_app);
+	foreach my $srch (@search_locations)
+	{
+	    if( -d File::Spec->catdir($app_dir, $srch, "environments"))
+	    {
+		$app_dir = Cwd::abs_path(File::Spec->catdir($app_dir, $srch));
+		last;
+	    }
+	}
+	push( @dirs, $app_dir );
+    }
 
     return @dirs;
 };
@@ -72,7 +109,7 @@ sub plack_app_dir
     0 == scalar(@cfg_base)
       or croak "plack_app_dir(), not plack_app_dir("
       . join( ",", ("\$") x scalar(@cfg_base) ) . ")";
-    return &{$plack_app_dir}();
+    return $plack_app_dir->();
 }
 
 =head2 plack_env_dir
@@ -82,9 +119,10 @@ Returns the environment directory of a L<Plack> application.
 =cut
 
 my $plack_env_dir = sub {
+    my @cfg_base = @_;
     my @dirs;
 
-    defined $ENV{PLACK_ENV} and push( @dirs, map { File::Spec->catdir( $_, "environment", $ENV{PLACK_ENV} ) } $plack_app_dir->() );
+    defined $ENV{PLACK_ENV} and push( @dirs, map { File::Spec->catdir( $_, "environments", $ENV{PLACK_ENV}, @cfg_base ) } $plack_app_dir->() );
 
     return @dirs;
 };
@@ -92,16 +130,13 @@ my $plack_env_dir = sub {
 sub plack_env_dir
 {
     my @cfg_base = @_;
-    0 == scalar(@cfg_base)
-      or croak "plack_app_dir(), not plack_app_dir("
-      . join( ",", ("\$") x scalar(@cfg_base) ) . ")";
-    return &{$plack_app_dir}();
+    return $plack_env_dir->(@cfg_base);
 }
 
 my $registered;
 $registered or do {
     File::ConfigDir::_plug_dir_source($plack_app_dir, ++$registered);
-    File::ConfigDir::_plug_dir_source($plack_env_dir, ++$registered);
+    File::ConfigDir::_plug_dir_source($plack_env_dir);
 };
 
 =head1 AUTHOR
