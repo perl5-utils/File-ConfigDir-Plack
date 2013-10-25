@@ -7,10 +7,10 @@ use warnings FATAL => 'all';
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 
 use Carp qw(croak);
-use Cwd ();
-use Exporter ();
-use File::Basename ();
-use File::Spec ();
+use Cwd             ();
+use Exporter        ();
+use File::Basename  ();
+use File::Spec      ();
 use File::ConfigDir ();
 
 =head1 NAME
@@ -19,17 +19,16 @@ File::ConfigDir::Plack - Plack plugin for File::ConfigDir
 
 =cut
 
-$VERSION = '0.001';
-@ISA     = qw(Exporter);
-@EXPORT  = ();
-@EXPORT_OK = (
-               qw(plack_app_dir plack_env_dir),
-             );
+$VERSION   = '0.001';
+@ISA       = qw(Exporter);
+@EXPORT    = ();
+@EXPORT_OK = ( qw(plack_app_dir plack_env_dir), );
 %EXPORT_TAGS = (
                  ALL => [@EXPORT_OK],
                );
 
 my $plack_app;
+
 BEGIN
 {
     defined $ENV{PLACK_ENV} and $plack_app = $0;
@@ -77,27 +76,30 @@ executed. It doesn't work outside of a Plack application.
 =cut
 
 my @search_locations = (
-    File::Spec->curdir, 
-    File::Spec->updir, 
-    File::Spec->catdir(File::Spec->updir, File::Spec->updir),
-    File::Spec->catdir(File::Spec->updir, File::Spec->updir, File::Spec->updir),
-);
+                         File::Spec->curdir,
+                         File::Spec->updir,
+                         File::Spec->catdir( File::Spec->updir, File::Spec->updir ),
+                         File::Spec->catdir(
+                                             File::Spec->updir, File::Spec->updir,
+                                             File::Spec->updir
+                                           ),
+                       );
 
 my $plack_app_dir = sub {
     my @dirs;
 
-    if(defined $plack_app)
+    if ( defined $plack_app )
     {
-	my $app_dir = File::Basename::dirname($plack_app);
-	foreach my $srch (@search_locations)
-	{
-	    if( -d File::Spec->catdir($app_dir, $srch, "environments"))
-	    {
-		$app_dir = Cwd::abs_path(File::Spec->catdir($app_dir, $srch));
-		last;
-	    }
-	}
-	push( @dirs, $app_dir );
+        my $app_dir = File::Basename::dirname($plack_app);
+        foreach my $srch (@search_locations)
+        {
+            if ( -d File::Spec->catdir( $app_dir, $srch, "environments" ) )
+            {
+                $app_dir = Cwd::abs_path( File::Spec->catdir( $app_dir, $srch ) );
+                last;
+            }
+        }
+        push( @dirs, $app_dir );
     }
 
     return @dirs;
@@ -122,7 +124,10 @@ my $plack_env_dir = sub {
     my @cfg_base = @_;
     my @dirs;
 
-    defined $ENV{PLACK_ENV} and push( @dirs, map { File::Spec->catdir( $_, "environments", $ENV{PLACK_ENV}, @cfg_base ) } $plack_app_dir->() );
+    defined $ENV{PLACK_ENV}
+      and push( @dirs,
+                map { File::Spec->catdir( $_, "environments", $ENV{PLACK_ENV}, @cfg_base ) }
+                  $plack_app_dir->() );
 
     return @dirs;
 };
@@ -134,10 +139,9 @@ sub plack_env_dir
 }
 
 my $registered;
-$registered or do {
-    File::ConfigDir::_plug_dir_source($plack_app_dir, ++$registered);
-    File::ConfigDir::_plug_dir_source($plack_env_dir);
-};
+File::ConfigDir::_plug_dir_source( $plack_app_dir, ++$registered )
+  and File::ConfigDir::_plug_dir_source($plack_env_dir)
+  unless $registered;
 
 =head1 AUTHOR
 
@@ -196,4 +200,4 @@ See L<http://dev.perl.org/licenses/> for more information.
 
 =cut
 
-1; # End of File::ConfigDir::Plack
+1;    # End of File::ConfigDir::Plack
