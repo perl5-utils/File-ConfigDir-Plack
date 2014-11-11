@@ -1,6 +1,6 @@
 package File::ConfigDir::Plack;
 
-use 5.006;
+use 5.008;
 
 use strict;
 use warnings FATAL => 'all';
@@ -19,13 +19,13 @@ File::ConfigDir::Plack - Plack plugin for File::ConfigDir
 
 =cut
 
-$VERSION   = '0.002';
-@ISA       = qw(Exporter);
-@EXPORT    = ();
-@EXPORT_OK = ( qw(plack_app_dir plack_env_dir), );
+$VERSION     = '0.002';
+@ISA         = qw(Exporter);
+@EXPORT      = ();
+@EXPORT_OK   = ( qw(plack_app_dir plack_env_dir), );
 %EXPORT_TAGS = (
-                 ALL => [@EXPORT_OK],
-               );
+    ALL => [@EXPORT_OK],
+);
 
 my $plack_app;
 
@@ -76,14 +76,10 @@ executed. It doesn't work outside of a Plack application.
 =cut
 
 my @search_locations = (
-                         File::Spec->curdir,
-                         File::Spec->updir,
-                         File::Spec->catdir( File::Spec->updir, File::Spec->updir ),
-                         File::Spec->catdir(
-                                             File::Spec->updir, File::Spec->updir,
-                                             File::Spec->updir
-                                           ),
-                       );
+    File::Spec->curdir, File::Spec->updir,
+    File::Spec->catdir( File::Spec->updir, File::Spec->updir ),
+    File::Spec->catdir( File::Spec->updir, File::Spec->updir, File::Spec->updir ),
+);
 
 my $plack_app_dir = sub {
     my @dirs;
@@ -109,8 +105,7 @@ sub plack_app_dir
 {
     my @cfg_base = @_;
     0 == scalar(@cfg_base)
-      or croak "plack_app_dir(), not plack_app_dir("
-      . join( ",", ("\$") x scalar(@cfg_base) ) . ")";
+      or croak "plack_app_dir(), not plack_app_dir(" . join( ",", ("\$") x scalar(@cfg_base) ) . ")";
     return $plack_app_dir->();
 }
 
@@ -125,9 +120,7 @@ my $plack_env_dir = sub {
     my @dirs;
 
     defined $ENV{PLACK_ENV}
-      and push( @dirs,
-                map { File::Spec->catdir( $_, "environments", $ENV{PLACK_ENV}, @cfg_base ) }
-                  $plack_app_dir->() );
+      and push( @dirs, map { File::Spec->catdir( $_, "environments", $ENV{PLACK_ENV}, @cfg_base ) } $plack_app_dir->() );
 
     return @dirs;
 };
@@ -190,7 +183,7 @@ into L<Jedi>.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2013 Jens Rehsack.
+Copyright 2013,2014 Jens Rehsack.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

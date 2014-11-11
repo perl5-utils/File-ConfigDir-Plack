@@ -6,61 +6,61 @@ use 5.008001;
 use ExtUtils::MakeMaker;
 
 my %RUN_DEPS = (
-                 'File::ConfigDir' => '0.009',
-                 'File::Basename'  => 0,
-                 'File::Path'      => '2.00',
-                 'File::Spec'      => 0,
-               );
+    'File::ConfigDir' => '0.009',
+    'File::Basename'  => 0,
+    'File::Path'      => '2.00',
+    'File::Spec'      => 0,
+);
 my %CONFIGURE_DEPS = (
-                       'ExtUtils::MakeMaker' => 0,
-                     );
+    'ExtUtils::MakeMaker' => 0,
+);
 my %BUILD_DEPS = ();
 
 my %TEST_DEPS = (
-                  'Test::More' => 0.90,
-                );
+    'Test::More' => 0.90,
+);
 
 WriteMakefile1(
-                MIN_PERL_VERSION => '5.008001',
-                META_ADD         => {
-                            'meta-spec' => { version => 2 },
-                            resources   => {
-                                repository => 'https://github.com/perl5-utils/File-ConfigDir-Plack',
-                                license    => 'http://dev.perl.org/licenses/',
-                            },
-                            prereqs => {
-                                         develop => {
-                                                     requires => {
-                                                         'Test::CPAN::Changes'                 => 0,
-                                                         'Test::CheckManifest'                 => 0,
-                                                         'Test::Pod'                           => 0,
-                                                         'Test::Pod::Coverage'                 => 0,
-                                                         'Test::Pod::Spelling::CommonMistakes' => 0,
-                                                     },
-                                                    },
-                                         configure => {
-                                                        requires => {%CONFIGURE_DEPS},
-                                                      },
-                                         build   => { requires => {%BUILD_DEPS} },
-                                         test    => { requires => {%TEST_DEPS} },
-                                         runtime => {
-                                                      requires => {
-                                                                    %RUN_DEPS,
-                                                                    perl => '5.8.1',
-                                                                  },
-                                                    },
-                                       },
-                            },
-                NAME           => 'File::ConfigDir::Plack',
-                VERSION_FROM   => 'lib/File/ConfigDir/Plack.pm',
-                ABSTRACT_FROM  => 'lib/File/ConfigDir/Plack.pm',
-                LICENSE        => 'perl',
-                AUTHOR         => q{Jens Rehsack <rehsack@cpan.org>},
-                PREREQ_PM      => \%RUN_DEPS,
-                BUILD_REQUIRES => \%BUILD_DEPS,
-                TEST_REQUIRES  => \%TEST_DEPS,
-                test           => { TESTS => 't/*.t xt/*.t' },
-              );
+    MIN_PERL_VERSION => '5.008001',
+    META_ADD         => {
+        'meta-spec' => { version => 2 },
+        resources   => {
+            repository => 'https://github.com/perl5-utils/File-ConfigDir-Plack',
+            license    => 'http://dev.perl.org/licenses/',
+        },
+        prereqs => {
+            develop => {
+                requires => {
+                    'Test::CPAN::Changes'                 => 0,
+                    'Test::CheckManifest'                 => 0,
+                    'Test::Pod'                           => 0,
+                    'Test::Pod::Coverage'                 => 0,
+                    'Test::Pod::Spelling::CommonMistakes' => 0,
+                },
+            },
+            configure => {
+                requires => {%CONFIGURE_DEPS},
+            },
+            build   => { requires => {%BUILD_DEPS} },
+            test    => { requires => {%TEST_DEPS} },
+            runtime => {
+                requires => {
+                    %RUN_DEPS,
+                    perl => '5.8.1',
+                },
+            },
+        },
+    },
+    NAME           => 'File::ConfigDir::Plack',
+    VERSION_FROM   => 'lib/File/ConfigDir/Plack.pm',
+    ABSTRACT_FROM  => 'lib/File/ConfigDir/Plack.pm',
+    LICENSE        => 'perl',
+    AUTHOR         => q{Jens Rehsack <rehsack@cpan.org>},
+    PREREQ_PM      => \%RUN_DEPS,
+    BUILD_REQUIRES => \%BUILD_DEPS,
+    TEST_REQUIRES  => \%TEST_DEPS,
+    test           => { TESTS => 't/*.t xt/*.t' },
+);
 
 sub WriteMakefile1
 {    # originally written by Alexandr Ciornii, version 0.21. Added by eumm-upgrade.
