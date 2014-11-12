@@ -19,7 +19,7 @@ File::ConfigDir::Plack - Plack plugin for File::ConfigDir
 
 =cut
 
-$VERSION     = '0.002';
+$VERSION     = '0.003';
 @ISA         = qw(Exporter);
 @EXPORT      = ();
 @EXPORT_OK   = ( qw(plack_app_dir plack_env_dir), );
