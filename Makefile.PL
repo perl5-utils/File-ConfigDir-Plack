@@ -25,15 +25,24 @@ WriteMakefile1(
     META_ADD         => {
         'meta-spec' => { version => 2 },
         resources   => {
-            repository => 'https://github.com/perl5-utils/File-ConfigDir-Plack',
-            license    => 'http://dev.perl.org/licenses/',
+            homepage   => 'https://metacpan.org/release/File-ConfigDir-Plack',
+            repository => {
+                url  => 'git@github.com:perl5-utils/File-ConfigDir-Plack.git',
+                web  => 'https://github.com/perl5-utils/File-ConfigDir-Plack',
+                type => 'git',
+            },
+            bugtracker => {
+                web    => 'http://rt.cpan.org/Public/Dist/Display.html?Name=File-ConfigDir-Plack',
+                mailto => 'file-configdir-plack@rt.cpan.org',
+            },
+            license => 'http://dev.perl.org/licenses/',
         },
         prereqs => {
             develop => {
                 requires => {
                     'Test::CPAN::Changes'                 => 0,
                     'Test::CheckManifest'                 => 0,
-		    'Test::Kwalitee'                      => 0,
+                    'Test::Kwalitee'                      => 0,
                     'Test::Pod'                           => 0,
                     'Test::Pod::Coverage'                 => 0,
                     'Test::Pod::Spelling::CommonMistakes' => 0,
